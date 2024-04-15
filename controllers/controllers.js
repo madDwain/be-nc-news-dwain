@@ -8,7 +8,6 @@ function getTopics(req, res, next) {
 
 function getEndpoints(req, res, next) {
     const endpoints = require('../endpoints.json')
-    console.log(typeof endpoints)
     res.status(200).send({endpoints})
 }
 
