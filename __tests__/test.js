@@ -12,6 +12,14 @@ afterAll(() => {
     db.end();
 });
 
+describe('invalid url', () => {
+    test('GET request with an invalid endpoint, should return 404 and a message', () => {
+        return request(app).get('/api/notgonnawork').expect(404).then(({error}) => {
+            expect(`${error}`).toBe('Error: cannot GET /api/notgonnawork (404)')
+        })
+    })
+})
+
 describe('/api/topics', () => {
     test('GET request should respond 200 and respond with an array of all the topic objects', () => {
         return request(app).get('/api/topics').expect(200).then(({body}) => {
