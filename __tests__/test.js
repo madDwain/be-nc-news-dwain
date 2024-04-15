@@ -65,4 +65,9 @@ describe('/api/articles/:article_id', () => {
             expect(article.article_id).toBe(4)
         })
     })
+    test('GET request should respond with 404 and a msg of invalid article_id if invalid article_id is passed', () => {
+        return request(app).get('/api/articles/10000086').expect(404).then(({body}) => {
+            expect(body.msg).toBe('invalid article ID')
+        })
+    })
 })
