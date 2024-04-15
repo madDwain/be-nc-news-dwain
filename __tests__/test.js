@@ -3,7 +3,6 @@ const db = require('../db/connection')
 const app = require('../app')
 const seed = require('../db/seeds/seed')
 const seedTestData = require('../db/data/test-data')
-const fs = require('fs/promises')
 const endpoints = require('../endpoints.json')
 
 beforeEach(() => {
@@ -40,8 +39,30 @@ describe('/api/topics', () => {
 
 describe('/api', () => {
     test('GET request should respond with 200 and an object containing all endpoints with a description', () => {
-        return request(app).get('/api').then(({body}) => {
-            expect(body.endpoints).toEqual(endpoints)
-            })
+    return request(app).get('/api').expect(200).then(({body}) => {
+        expect(body.endpoints).toEqual(endpoints)
         })
     })
+})
+
+describe('/api/articles/:article_id', () => {
+    test('GET request should respond with 200 and an object', () => {
+        return request(app).get('/api/articles/4').expect(200).then(({body}) => {
+            const {article} = body
+            expect(typeof article).toBe('object')
+        })
+    })
+    test(`GET request should respond with an object containing the folowing properties:author, title, article_id, body, topic, created_at, votes, article_img_url`, () => {
+        return request(app).get('/api/articles/4').then(({body}) => {
+            const {article} = body
+            expect(article).toHaveProperty('author')
+            expect(article).toHaveProperty('title')
+            expect(article).toHaveProperty('body')
+            expect(article).toHaveProperty('topic')
+            expect(article).toHaveProperty('created_at')
+            expect(article).toHaveProperty('votes')
+            expect(article).toHaveProperty('article_img_url')
+            expect(article.article_id).toBe(4)
+        })
+    })
+})
