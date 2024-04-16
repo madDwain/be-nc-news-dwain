@@ -11,6 +11,26 @@ function fetchArticleById(article_id) {
     });
 }
 
+async function fetchAllArticles() {
+  return await db.query("SELECT * FROM articles ORDER BY created_at DESC;").then(({ rows }) => {
+    const articlesArray = rows.map((article) => {
+      const article_id = article.article_id;
+      return db
+        .query(`SELECT SUM(${article_id}) AS comment_count FROM comments`)
+        .then((data) => {
+          const sum = data.rows[0].comment_count;
+          article.comment_count = sum;
+          return article;
+        });
+    });
+
+    return Promise.all(articlesArray).then((resolvedArray) => {
+      return resolvedArray;
+    });
+  });
+}
+
 module.exports = {
   fetchArticleById,
+  fetchAllArticles,
 };

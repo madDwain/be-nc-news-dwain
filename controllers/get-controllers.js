@@ -1,5 +1,6 @@
 const { fetchTopics } = require("../models/topics-models");
-const { fetchArticleById } = require("../models/articles-models");
+const { fetchArticleById,
+fetchAllArticles } = require("../models/articles-models");
 
 function getTopics(req, res, next) {
   return fetchTopics().then((topics) => {
@@ -23,8 +24,16 @@ function getArticle(req, res, next) {
     });
 }
 
+function getAllArticles(req, res, next) {
+  return fetchAllArticles()
+  .then((articles) => {
+    res.status(200).send( {articles} )
+  })
+}
+
 module.exports = {
   getTopics,
   getEndpoints,
   getArticle,
+  getAllArticles
 };
