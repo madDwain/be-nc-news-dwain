@@ -1,6 +1,7 @@
 const { fetchTopics } = require("../models/topics-models");
 const { fetchArticleById,
 fetchAllArticles } = require("../models/articles-models");
+const { fetchCommentsByArticleID } = require("../models/comments-models")
 
 function getTopics(req, res, next) {
   return fetchTopics().then((topics) => {
@@ -31,9 +32,24 @@ function getAllArticles(req, res, next) {
   })
 }
 
+function getCommentsByArticleID(req, res, next) {
+  const { article_id } = req.params
+  const regex = /[^0-9]/
+  if (regex.test(article_id)) {
+    next({status: 400, msg: 'article_id is not a number'})
+  }
+  return fetchCommentsByArticleID(article_id).then((comments) => {
+    res.status(200).send( {comments} )
+  })
+  .catch((err) => {
+    next(err)
+  })
+}
+
 module.exports = {
   getTopics,
   getEndpoints,
   getArticle,
-  getAllArticles
+  getAllArticles,
+  getCommentsByArticleID
 };
