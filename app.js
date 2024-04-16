@@ -7,6 +7,7 @@ const {
   getAllArticles,
 } = require("./controllers/get-controllers");
 const { postComment } = require("./controllers/post-controllers");
+const { patchArticle } = require("./controllers/patch-controllers")
 
 const app = express();
 app.use(express.json());
@@ -19,7 +20,14 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
 
 app.post("/api/articles/:article_id/comments", postComment);
 
+app.patch('/api/articles/:article_id', patchArticle)
+
 app.use((err, req, res, next) => {
-  if (err.status && err.msg) res.status(err.status).send(err);
+    if (err.status && err.msg) {
+    res.status(err.status).send(err)
+  }
+  if (err.code === '23502') {
+    res.status(400).send({msg: 'no new vote object'})
+  }
 });
 module.exports = app;
