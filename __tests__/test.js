@@ -126,7 +126,49 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).toBeSortedBy('created_at', {descending : true});
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+
+describe("api/articles/:article_id/comments", () => {
+  test("GET request responds with 200 and responds with an array of objects with the following properties     comment_id, votes, created_at, author, body, article_id", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .then(({ body }) => {
+        const { comments } = body;
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+      });
+  });
+  test("returned array should be ordered with most recent comments first", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("GET request should respond with 404 and a msg of invalid article_id if invalid article_id is passed", () => {
+    return request(app)
+      .get("/api/articles/10000086/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid article ID");
+      });
+  });
+  test("GET request should respond with 404 and a msg of invalid article_id if passed bad request", () => {
+    return request(app)
+      .get("/api/articles/78787HELLO/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article_id is not a number");
       });
   });
 });
