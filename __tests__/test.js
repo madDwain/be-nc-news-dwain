@@ -132,43 +132,129 @@ describe("/api/articles", () => {
 });
 
 describe("api/articles/:article_id/comments", () => {
-  test("GET request responds with 200 and responds with an array of objects with the following properties     comment_id, votes, created_at, author, body, article_id", () => {
-    return request(app)
-      .get("/api/articles/3/comments")
-      .then(({ body }) => {
-        const { comments } = body;
-        comments.forEach((comment) => {
-          expect(comment).toHaveProperty("author");
-          expect(comment).toHaveProperty("comment_id");
-          expect(comment).toHaveProperty("votes");
-          expect(comment).toHaveProperty("created_at");
-          expect(comment).toHaveProperty("body");
-          expect(comment).toHaveProperty("article_id");
+  describe("GET request", () => {
+    test("responds with 200 and responds with an array of objects with the following properties: comment_id, votes, created_at, author, body, article_id", () => {
+      return request(app)
+        .get("/api/articles/3/comments")
+        .then(({ body }) => {
+          const { comments } = body;
+          comments.forEach((comment) => {
+            expect(comment).toHaveProperty("author");
+            expect(comment).toHaveProperty("comment_id");
+            expect(comment).toHaveProperty("votes");
+            expect(comment).toHaveProperty("created_at");
+            expect(comment).toHaveProperty("body");
+            expect(comment).toHaveProperty("article_id");
+          });
         });
-      });
+    });
+    test("returned array should be ordered with most recent comments first", () => {
+      return request(app)
+        .get("/api/articles/3/comments")
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+    test("should respond with 404 and a msg of invalid article_id  article_id is not found", () => {
+      return request(app)
+        .get("/api/articles/10000086/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid article ID");
+        });
+    });
+    test("should respond with 400 and a msg of invalid article_id if passed bad request", () => {
+      return request(app)
+        .get("/api/articles/78787HELLO/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("article_id is not a number");
+        });
+    });
   });
-  test("returned array should be ordered with most recent comments first", () => {
-    return request(app)
-      .get("/api/articles/3/comments")
-      .then(({ body }) => {
-        const { comments } = body;
-        expect(comments).toBeSortedBy("created_at", { descending: true });
+  describe("POST request", () => {
+    test("should respond with 201, accepting an object with username and body properties and respond with the comment object with the following properties: comment_id, votes, created_at, author, body, article_id", () => {
+      const newComment = {
+        username: "icellusedkars",
+        body: "W article",
+      };
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const comment = body;
+          expect(comment.author).toBe("icellusedkars");
+          expect(comment.comment_id).toBe(19);
+          expect(comment.votes).toBe(0);
+          expect(comment).toHaveProperty("created_at");
+          expect(comment.body).toBe("W article");
+          expect(comment.article_id).toBe(2);
+        });
+    });
+    test("should respond with 404 and a msg of invalid article_id  article_id is not found", () => {
+      const newComment = {
+        username: "icellusedkars",
+        body: "W article",
+      };
+      return request(app)
+        .post("/api/articles/10000086/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("article ID not found");
+        });
+    });
+    test("should return with 400 and a msg of article ID is not a number", () => {
+      const newComment = {
+        username: "icellusedkars",
+        body: "W article",
+      };
+      return request(app)
+        .post("/api/articles/100dwain00086/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid article ID");
+        });
+    });
+    test("should return with 400 and a msg of invalid comment object if the object does not have a username property", () => {
+      const newComment = {
+        username: "icellusedkars"
+      };
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid comment object");
+        })
+    });
+    test("should return with 400 and a msg of invalid comment object if the object does not have a body property", () => {
+        const newComment = {
+            body: "W article"
+          }
+        return request(app)
+          .post("/api/articles/3/comments")
+          .send(newComment)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("invalid comment object");
+          })
       });
-  });
-  test("GET request should respond with 404 and a msg of invalid article_id if invalid article_id is passed", () => {
-    return request(app)
-      .get("/api/articles/10000086/comments")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("invalid article ID");
-      });
-  });
-  test("GET request should respond with 404 and a msg of invalid article_id if passed bad request", () => {
-    return request(app)
-      .get("/api/articles/78787HELLO/comments")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("article_id is not a number");
-      });
+    test('should return 400 and a msg of invalid comment passed if either body or username is not a string', () => {
+        const newComment = {
+            body: 12345,
+            username: 67890
+        }
+        return request(app)
+          .post("/api/articles/3/comments")
+          .send(newComment)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("invalid comment passed");
+          })
+    })
   });
 });
