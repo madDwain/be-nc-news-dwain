@@ -58,37 +58,39 @@ describe("/api", () => {
 });
 
 describe("/api/articles/:article_id", () => {
-  test("GET request should respond with 200 and an object", () => {
-    return request(app)
-      .get("/api/articles/4")
-      .expect(200)
-      .then(({ body }) => {
-        const { article } = body;
-        expect(typeof article).toBe("object");
-      });
-  });
-  test(`GET request should respond with an object containing the folowing properties:author, title, article_id, body, topic, created_at, votes, article_img_url`, () => {
-    return request(app)
-      .get("/api/articles/4")
-      .then(({ body }) => {
-        const { article } = body;
-        expect(article).toHaveProperty("author");
-        expect(article).toHaveProperty("title");
-        expect(article).toHaveProperty("body");
-        expect(article).toHaveProperty("topic");
-        expect(article).toHaveProperty("created_at");
-        expect(article).toHaveProperty("votes");
-        expect(article).toHaveProperty("article_img_url");
-        expect(article.article_id).toBe(4);
-      });
-  });
-  test("GET request should respond with 404 and a msg of invalid article_id if invalid article_id is passed", () => {
-    return request(app)
-      .get("/api/articles/10000086")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("invalid article ID");
-      });
+  describe("GET request", () => {
+    test("should respond with 200 and an object", () => {
+      return request(app)
+        .get("/api/articles/4")
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(typeof article).toBe("object");
+        });
+    });
+    test(`should respond with an object containing the folowing properties:author, title, article_id, body, topic, created_at, votes, article_img_url`, () => {
+      return request(app)
+        .get("/api/articles/4")
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("body");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article.article_id).toBe(4);
+        });
+    });
+    test("should respond with 404 and a msg of invalid article_id if invalid article_id is passed", () => {
+      return request(app)
+        .get("/api/articles/10000086")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid article ID");
+        });
+    });
   });
 });
 
@@ -221,7 +223,7 @@ describe("api/articles/:article_id/comments", () => {
     });
     test("should return with 400 and a msg of invalid comment object if the object does not have a username property", () => {
       const newComment = {
-        username: "icellusedkars"
+        username: "icellusedkars",
       };
       return request(app)
         .post("/api/articles/3/comments")
@@ -229,32 +231,32 @@ describe("api/articles/:article_id/comments", () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("invalid comment object");
-        })
+        });
     });
     test("should return with 400 and a msg of invalid comment object if the object does not have a body property", () => {
-        const newComment = {
-            body: "W article"
-          }
-        return request(app)
-          .post("/api/articles/3/comments")
-          .send(newComment)
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("invalid comment object");
-          })
-      });
-    test('should return 400 and a msg of invalid comment passed if either body or username is not a string', () => {
-        const newComment = {
-            body: 12345,
-            username: 67890
-        }
-        return request(app)
-          .post("/api/articles/3/comments")
-          .send(newComment)
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("invalid comment passed");
-          })
-    })
+      const newComment = {
+        body: "W article",
+      };
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid comment object");
+        });
+    });
+    test("should return 400 and a msg of invalid comment passed if either body or username is not a string", () => {
+      const newComment = {
+        body: 12345,
+        username: 67890,
+      };
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid comment passed");
+        });
+    });
   });
 });
