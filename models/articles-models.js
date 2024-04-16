@@ -12,7 +12,7 @@ function fetchArticleById(article_id) {
 }
 
 async function fetchAllArticles() {
-  return await db.query("SELECT * FROM articles ORDER BY created_at DESC;").then(({ rows }) => {
+  return await db.query("SELECT article_id, title, topic, author, created_at, votes, article_img_url FROM articles ORDER BY created_at DESC;").then(({ rows }) => {
     const articlesArray = rows.map((article) => {
       const article_id = article.article_id;
       return db

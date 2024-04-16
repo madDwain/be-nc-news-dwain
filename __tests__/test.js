@@ -112,7 +112,6 @@ describe("/api/articles", () => {
           const { articles } = body;
           expect(article).toHaveProperty("author");
           expect(article).toHaveProperty("title");
-          expect(article).toHaveProperty("body");
           expect(article).toHaveProperty("topic");
           expect(article).toHaveProperty("created_at");
           expect(article).toHaveProperty("votes");
