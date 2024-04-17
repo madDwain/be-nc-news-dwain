@@ -5,7 +5,8 @@ const {
   getEndpoints,
   getArticle,
   getAllArticles,
-  getCommentById
+  getCommentById,
+  getAllUsers
 } = require("./controllers/get-controllers");
 const { postComment } = require("./controllers/post-controllers");
 const { patchArticle } = require("./controllers/patch-controllers")
@@ -20,6 +21,7 @@ app.get("/api/articles/:article_id", getArticle);
 app.get("/api/articles", getAllArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
 app.get("/api/comments/:comment_id", getCommentById)
+app.get('/api/users', getAllUsers)
 
 app.post("/api/articles/:article_id/comments", postComment);
 
