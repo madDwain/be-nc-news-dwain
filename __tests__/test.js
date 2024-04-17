@@ -338,3 +338,21 @@ describe("/api/comments/:comment_id", () => {
     })
   });
 });
+
+describe('/api/users', () => {
+    describe('GET request', () => {
+        test('should respond with 200 and return an array of objects with the following properties: username, name. avatar_url', () => {
+            return request(app)
+            .get('/api/users')
+            .expect(200)
+            .then(({ body }) => {
+                const { users } = body
+                users.forEach((user) => {
+                    expect(user).toHaveProperty('username')
+                    expect(user).toHaveProperty('name')
+                    expect(user).toHaveProperty('avatar_url')
+                })
+            })
+        })
+    })
+})

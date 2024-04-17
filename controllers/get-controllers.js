@@ -7,6 +7,7 @@ const {
   fetchCommentsByArticleID,
   fetchCommentById,
 } = require("../models/comments-models");
+const { fetchUsers } = require("../models/users-models")
 
 function getTopics(req, res, next) {
   return fetchTopics().then((topics) => {
@@ -62,6 +63,12 @@ function getCommentById(req, res, next) {
     });
 }
 
+function getAllUsers(req, res, next) {
+  return fetchUsers().then((users) => {
+    res.status(200).send({ users })
+  })
+}
+
 module.exports = {
   getTopics,
   getEndpoints,
@@ -69,4 +76,5 @@ module.exports = {
   getAllArticles,
   getCommentsByArticleID,
   getCommentById,
+  getAllUsers
 };
