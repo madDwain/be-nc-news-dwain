@@ -7,7 +7,7 @@ const {
   fetchCommentsByArticleID,
   fetchCommentById,
 } = require("../models/comments-models");
-const { fetchUsers } = require("../models/users-models")
+const { fetchUsers } = require("../models/users-models");
 
 function getTopics(req, res, next) {
   return fetchTopics().then((topics) => {
@@ -32,9 +32,14 @@ function getArticle(req, res, next) {
 }
 
 function getAllArticles(req, res, next) {
-  return fetchAllArticles().then((articles) => {
-    res.status(200).send({ articles });
-  });
+  const { topic } = req.query;
+  return fetchAllArticles(topic)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
 }
 
 function getCommentsByArticleID(req, res, next) {
@@ -65,8 +70,8 @@ function getCommentById(req, res, next) {
 
 function getAllUsers(req, res, next) {
   return fetchUsers().then((users) => {
-    res.status(200).send({ users })
-  })
+    res.status(200).send({ users });
+  });
 }
 
 module.exports = {
@@ -76,5 +81,5 @@ module.exports = {
   getAllArticles,
   getCommentsByArticleID,
   getCommentById,
-  getAllUsers
+  getAllUsers,
 };

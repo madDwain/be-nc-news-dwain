@@ -169,6 +169,23 @@ describe("/api/articles", () => {
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
+  test('GET request with topic=mitch query should respond with an array of objects where the topic is mitch', () => {
+    return request(app)
+    .get('/api/articles?topic=mitch')
+    .then(({ body }) => {
+        const { articles } = body
+        articles.forEach((article) => {
+            expect(article.topic).toBe('mitch')
+        })
+    })
+  })
+  test('GET request with topic=notatopic query should respond with 404 and a msg of topic not found', () => {
+    return request(app)
+    .get('/api/articles?topic=notatopic')
+    .then(({ body }) => {
+        expect(body.msg).toBe('topic not found')
+    })
+  })
 });
 
 describe("api/articles/:article_id/comments", () => {
@@ -328,31 +345,34 @@ describe("/api/comments/:comment_id", () => {
     test("responds with status 204", () => {
       return request(app).delete("/api/comments/2").expect(204);
     });
-    test('responds with status 404 when comment not found', () => {
-        return request(app).delete("/api/comments/1000").expect(404);
-    })
-    test('responds with status 400 when comment is invalid', () => {
-        return request(app).delete("/api/comments/notanumber").expect(400).then(({body}) => {
-            expect(body.msg).toBe('invalid comment id')
+    test("responds with status 404 when comment not found", () => {
+      return request(app).delete("/api/comments/1000").expect(404);
+    });
+    test("responds with status 400 when comment is invalid", () => {
+      return request(app)
+        .delete("/api/comments/notanumber")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid comment id");
         });
-    })
+    });
   });
 });
 
-describe('/api/users', () => {
-    describe('GET request', () => {
-        test('should respond with 200 and return an array of objects with the following properties: username, name. avatar_url', () => {
-            return request(app)
-            .get('/api/users')
-            .expect(200)
-            .then(({ body }) => {
-                const { users } = body
-                users.forEach((user) => {
-                    expect(user).toHaveProperty('username')
-                    expect(user).toHaveProperty('name')
-                    expect(user).toHaveProperty('avatar_url')
-                })
-            })
-        })
-    })
-})
+describe("/api/users", () => {
+  describe("GET request", () => {
+    test("should respond with 200 and return an array of objects with the following properties: username, name. avatar_url", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          const { users } = body;
+          users.forEach((user) => {
+            expect(user).toHaveProperty("username");
+            expect(user).toHaveProperty("name");
+            expect(user).toHaveProperty("avatar_url");
+          });
+        });
+    });
+  });
+});
