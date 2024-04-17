@@ -11,8 +11,17 @@ function fetchArticleById(article_id) {
     });
 }
 
-async function fetchAllArticles() {
-  return await db.query("SELECT article_id, title, topic, author, created_at, votes, article_img_url FROM articles ORDER BY created_at DESC;").then(({ rows }) => {
+async function fetchAllArticles(topic) {
+  let sqlString =
+    "SELECT article_id, title, topic, author, created_at, votes, article_img_url FROM articles";
+  if (topic) {
+    sqlString += ` WHERE articles.topic = '${topic}'`;
+  }
+  sqlString += " ORDER BY created_at DESC;";
+  return await db.query(sqlString).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "topic not found" });
+    }
     const articlesArray = rows.map((article) => {
       const article_id = article.article_id;
       return db
@@ -22,30 +31,36 @@ async function fetchAllArticles() {
           article.comment_count = sum;
           return article;
         });
-    });
+    })
 
     return Promise.all(articlesArray).then((resolvedArray) => {
       return resolvedArray;
     });
-  });
+  })
+  .catch((err) => {
+    return Promise.reject({ status: 404, msg: "topic not found" })
+})
 }
 
 function incVotesOnArticle(article_id, inc_votes) {
-    return db
-    .query(`UPDATE articles SET votes = votes + $2 WHERE article_id = $1 RETURNING *;`, [article_id, inc_votes])
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $2 WHERE article_id = $1 RETURNING *;`,
+      [article_id, inc_votes]
+    )
     .then(({ rows }) => {
-        if (rows.length === 0) {
-            return Promise.reject({status: 404, msg: 'article id not found'})
-        }
-        return rows[0]
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "article id not found" });
+      }
+      return rows[0];
     })
     .catch((err) => {
-        return Promise.reject(err)
-    })
+      return Promise.reject(err);
+    });
 }
 
 module.exports = {
   fetchArticleById,
   fetchAllArticles,
-  incVotesOnArticle
+  incVotesOnArticle,
 };
