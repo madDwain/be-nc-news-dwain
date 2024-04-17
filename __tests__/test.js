@@ -121,14 +121,14 @@ describe("/api/articles/:article_id", () => {
           expect(body.msg).toBe("no new vote object");
         });
     });
-    test('should return 404 and a message of article id not found if artcile id not found', () => {
-        return request(app)
-        .patch('/api/articles/9999')
+    test("should return 404 and a message of article id not found if artcile id not found", () => {
+      return request(app)
+        .patch("/api/articles/9999")
         .expect(404)
-        .then(({body}) => {
-            expect(body.msg).toBe('article id not found')
-        })
-    })
+        .then(({ body }) => {
+          expect(body.msg).toBe("article id not found");
+        });
+    });
   });
 });
 
@@ -296,5 +296,45 @@ describe("api/articles/:article_id/comments", () => {
           expect(body.msg).toBe("invalid comment passed");
         });
     });
+  });
+});
+
+describe("/api/comments/:comment_id", () => {
+  describe("GET request", () => {
+    test("responds with 200 and an object with the following properties: comment_id, votes, created_at, author, body, article_id", () => {
+      return request(app)
+        .get("/api/comments/2")
+        .expect(200)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+    });
+    test("should respond with 404 and a msg of comment_id not found if comment_id is not found", () => {
+      return request(app)
+        .get("/api/comments/10000086")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("comment id not found");
+        });
+    });
+  });
+  describe("DELETE request", () => {
+    test("responds with status 204", () => {
+      return request(app).delete("/api/comments/2").expect(204);
+    });
+    test('responds with status 404 when comment not found', () => {
+        return request(app).delete("/api/comments/1000").expect(404);
+    })
+    test('responds with status 400 when comment is invalid', () => {
+        return request(app).delete("/api/comments/notanumber").expect(400).then(({body}) => {
+            expect(body.msg).toBe('invalid comment id')
+        });
+    })
   });
 });

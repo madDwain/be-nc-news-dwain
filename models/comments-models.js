@@ -20,20 +20,52 @@ function insertComment(username, body, article_id) {
       `INSERT INTO comments
     (author, body, article_id)
     VALUES
-    ($1, $2, $3) RETURNING *;`, [username, body, article_id]
+    ($1, $2, $3) RETURNING *;`,
+      [username, body, article_id]
     )
     .then(({ rows }) => {
       return rows[0];
     })
     .catch((err) => {
-        if (err.code === '22P02')
-        return Promise.reject({status: 400, msg: 'invalid article ID'})
-        if (err.code === '23503')
-        return Promise.reject({status: 404, msg: 'article ID not found'})
+      if (err.code === "22P02")
+        return Promise.reject({ status: 400, msg: "invalid article ID" });
+      if (err.code === "23503")
+        return Promise.reject({ status: 404, msg: "article ID not found" });
+    });
+}
+
+function fetchCommentById(comment_id) {
+  return db
+    .query("SELECT * FROM comments WHERE comment_id = $1;", [comment_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "comment id not found" });
+      }
+      return rows[0];
+    });
+}
+
+function removeComment(comment_id) {
+  return db
+    .query("DELETE FROM comments WHERE comment_id = $1 RETURNING *;", [
+      comment_id,
+    ])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "comment id not found" });
+      }
     })
+    .catch((err) => {
+        if (err.code === '22P02') {
+            return Promise.reject({ status: 400, msg: 'invalid comment id'})
+        }
+      return err
+    });
 }
 
 module.exports = {
   fetchCommentsByArticleID,
   insertComment,
+  removeComment,
+  fetchCommentById,
 };
