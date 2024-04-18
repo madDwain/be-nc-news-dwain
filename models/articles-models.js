@@ -10,7 +10,14 @@ function checkIfTopicExists(topic) {
     });
 }
 
-function fetchArticleById(article_id) {
+function fetchArticleById(article_id, query) {
+  if (query === 'comment_count') {
+    return db
+    .query("SELECT COUNT(comment_id) AS comment_count FROM comments WHERE article_id = $1", [article_id])
+    .then(({rows}) => {
+      return rows[0]
+    })
+  }
   return db
     .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
     .then(({ rows }) => {

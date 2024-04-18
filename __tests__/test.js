@@ -91,6 +91,22 @@ describe("/api/articles/:article_id", () => {
           expect(body.msg).toBe("invalid article ID");
         });
     });
+    test("should respond with an object containing the comment_count for the article_id when passed a query=comment_count", () => {
+      return request(app)
+        .get("/api/articles/1?query=comment_count")
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article.comment_count).toBe("11");
+        });
+    });
+    test("should respond with an object containing the comment_count=0 for the article_id when passed a query=comment_count and article id with no comments", () => {
+      return request(app)
+        .get("/api/articles/2?query=comment_count")
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article.comment_count).toBe("0");
+        });
+    });
   });
   describe("PATCH request", () => {
     test("should accept an object in the form { inc_votes: newVote }, returning 200 and the updated article", () => {
@@ -244,10 +260,10 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         const { articles } = body;
         articles.forEach((article) => {
-          expect(article).not.toHaveProperty('body')
-        })
+          expect(article).not.toHaveProperty("body");
+        });
       });
-  })
+  });
 });
 
 describe("api/articles/:article_id/comments", () => {

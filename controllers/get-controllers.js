@@ -21,8 +21,9 @@ function getEndpoints(req, res, next) {
 }
 
 function getArticle(req, res, next) {
+  const { query } = req.query
   const { article_id } = req.params;
-  return fetchArticleById(article_id)
+  return fetchArticleById(article_id, query)
     .then((article) => {
       res.status(200).send({ article });
     })
