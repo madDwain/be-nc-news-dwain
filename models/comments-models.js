@@ -11,6 +11,9 @@ function fetchCommentsByArticleID(article_id) {
         return Promise.reject({ status: 404, msg: "invalid article ID" });
       }
       return rows;
+    })
+    .catch((err) => {
+        return Promise.reject(err)
     });
 }
 
@@ -27,10 +30,7 @@ function insertComment(username, body, article_id) {
       return rows[0];
     })
     .catch((err) => {
-      if (err.code === "22P02")
-        return Promise.reject({ status: 400, msg: "invalid article ID" });
-      if (err.code === "23503")
-        return Promise.reject({ status: 404, msg: "article ID not found" });
+      return Promise.reject(err)
     });
 }
 
@@ -56,10 +56,10 @@ function removeComment(comment_id) {
       }
     })
     .catch((err) => {
-        if (err.code === '22P02') {
-            return Promise.reject({ status: 400, msg: 'invalid comment id'})
-        }
-      return err
+      if (err.code === "22P02") {
+        return Promise.reject({ status: 400, msg: "invalid comment id" });
+      }
+      return Promise.reject(err);
     });
 }
 
