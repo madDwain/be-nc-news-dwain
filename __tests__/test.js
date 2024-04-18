@@ -154,22 +154,22 @@ describe("/api/articles/:article_id", () => {
     });
     test("should return 400 if article id is not a number", () => {
       return request(app)
-      .patch("/api/articles/notanumber")
-      .send({ inc_votes: 10 })
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('invalid id type')
-      })
-    })
+        .patch("/api/articles/notanumber")
+        .send({ inc_votes: 10 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid id type");
+        });
+    });
     test("should return 400 if inc_votes value is not a number", () => {
       return request(app)
-      .patch("/api/articles/1")
-      .send({ inc_votes: 'notanumber' })
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('invalid id type')
-      })
-    })
+        .patch("/api/articles/1")
+        .send({ inc_votes: "notanumber" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid id type");
+        });
+    });
   });
 });
 
@@ -210,32 +210,43 @@ describe("/api/articles", () => {
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
-  test('GET request with topic=mitch query should respond with an array of objects where the topic is mitch', () => {
+  test("GET request with topic=mitch query should respond with an array of objects where the topic is mitch", () => {
     return request(app)
-    .get('/api/articles?topic=mitch')
-    .then(({ body }) => {
-        const { articles } = body
+      .get("/api/articles?topic=mitch")
+      .then(({ body }) => {
+        const { articles } = body;
         articles.forEach((article) => {
-            expect(article.topic).toBe('mitch')
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  test("GET request with topic=notatopic query should respond with 404 and a msg of topic not found", () => {
+    return request(app)
+      .get("/api/articles?topic=notatopic")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("topic not found");
+      });
+  });
+  test("GET request should respond with 200 and an empty array, when topic exists but no comments", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toEqual([]);
+      });
+  });
+  test("GET request should respond with array of artcle objects which do not contain a body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        articles.forEach((article) => {
+          expect(article).not.toHaveProperty('body')
         })
-    })
-  })
-  test('GET request with topic=notatopic query should respond with 404 and a msg of topic not found', () => {
-    return request(app)
-    .get('/api/articles?topic=notatopic')
-    .expect(404)
-    .then(({ body }) => {
-        expect(body.msg).toBe('topic not found')
-    })
-  })
-  test('GET request should respond with 200 and an empty array, when topic exists but no comments', () => {
-    return request(app)
-    .get('/api/articles?topic=paper')
-    .expect(200)
-    .then(({ body }) => {
-      const {articles} = body
-        expect(articles).toEqual([])
-    })
+      });
   })
 });
 

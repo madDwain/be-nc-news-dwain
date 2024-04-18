@@ -37,7 +37,7 @@ async function fetchAllArticles(topic) {
     })
     .then(() => {
       let sqlString =
-        "SELECT articles.*, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id";
+        "SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, article_img_url, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id";
 
       if (topic) {
         sqlString += ` WHERE topic='${topic}'`;
