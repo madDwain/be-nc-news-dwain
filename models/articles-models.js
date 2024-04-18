@@ -38,7 +38,7 @@ async function fetchAllArticles(topic) {
     });
   })
   .catch((err) => {
-    return Promise.reject({ status: 404, msg: "topic not found" })
+    return Promise.reject(err)
 })
 }
 

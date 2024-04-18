@@ -44,10 +44,6 @@ function getAllArticles(req, res, next) {
 
 function getCommentsByArticleID(req, res, next) {
   const { article_id } = req.params;
-  const regex = /[^0-9]/;
-  if (regex.test(article_id)) {
-    next({ status: 400, msg: "article_id is not a number" });
-  }
   return fetchCommentsByArticleID(article_id)
     .then((comments) => {
       res.status(200).send({ comments });

@@ -213,7 +213,7 @@ describe("api/articles/:article_id/comments", () => {
           expect(comments).toBeSortedBy("created_at", { descending: true });
         });
     });
-    test("should respond with 404 and a msg of invalid article_id  article_id is not found", () => {
+    test("should respond with 404 and a msg of invalid article_id if article_id is not found", () => {
       return request(app)
         .get("/api/articles/10000086/comments")
         .expect(404)
@@ -250,7 +250,7 @@ describe("api/articles/:article_id/comments", () => {
           expect(comment.article_id).toBe(2);
         });
     });
-    test("should respond with 404 and a msg of invalid article_id  article_id is not found", () => {
+    test("should respond with 404 and a msg of invalid article_id if article_id is not found", () => {
       const newComment = {
         username: "icellusedkars",
         body: "W article",
@@ -260,7 +260,7 @@ describe("api/articles/:article_id/comments", () => {
         .send(newComment)
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("article ID not found");
+          expect(body.msg).toBe("article id not found");
         });
     });
     test("should return with 400 and a msg of article ID is not a number", () => {
@@ -273,7 +273,7 @@ describe("api/articles/:article_id/comments", () => {
         .send(newComment)
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("invalid article ID");
+          expect(body.msg).toBe("article_id is not a number");
         });
     });
     test("should return with 400 and a msg of invalid comment object if the object does not have a username property", () => {
