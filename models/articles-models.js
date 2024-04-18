@@ -1,5 +1,15 @@
 const db = require("../db/connection");
 
+function checkIfTopicExists(topic) {
+  return db
+    .query("SELECT * FROM topics WHERE slug = $1;", [topic])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "topic not found" });
+      }
+    });
+}
+
 function fetchArticleById(article_id) {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
@@ -13,30 +23,34 @@ function fetchArticleById(article_id) {
 
 async function fetchAllArticles(topic) {
   let sqlString =
-    "SELECT article_id, title, topic, author, created_at, votes, article_img_url FROM articles";
+    "SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, article_img_url FROM articles JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id;";
   if (topic) {
-    sqlString += ` WHERE articles.topic = '${topic}'`;
+    await checkIfTopicExists(topic).then(() => {});
   }
-  sqlString += " ORDER BY created_at DESC;";
-  return await db.query(sqlString).then(({ rows }) => {
-    if (rows.length === 0) {
-      return Promise.reject({ status: 404, msg: "topic not found" });
-    }
-    const articlesArray = rows.map((article) => {
-      const article_id = article.article_id;
-      return db
-        .query(`SELECT SUM(${article_id}) AS comment_count FROM comments`)
-        .then((data) => {
-          const sum = data.rows[0].comment_count;
-          article.comment_count = sum;
-          return article;
-        });
-    })
 
-    return Promise.all(articlesArray).then((resolvedArray) => {
-      return resolvedArray;
+  return db
+    .query(sqlString)
+    .then(() => {
+      return db.query(
+        "SELECT title FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id"
+      );
+    })
+    .then(() => {
+      let sqlString =
+        "SELECT articles.*, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id";
+
+      if (topic) {
+        sqlString += ` WHERE topic='${topic}'`;
+      }
+
+      sqlString +=
+        " GROUP BY articles.article_id ORDER BY articles.created_at DESC;";
+
+      return db.query(sqlString);
+    })
+    .then(({ rows }) => {
+      return rows;
     });
-  })
 }
 
 function incVotesOnArticle(article_id, inc_votes) {
@@ -50,7 +64,7 @@ function incVotesOnArticle(article_id, inc_votes) {
         return Promise.reject({ status: 404, msg: "article id not found" });
       }
       return rows[0];
-    })
+    });
 }
 
 module.exports = {

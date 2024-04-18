@@ -223,8 +223,18 @@ describe("/api/articles", () => {
   test('GET request with topic=notatopic query should respond with 404 and a msg of topic not found', () => {
     return request(app)
     .get('/api/articles?topic=notatopic')
+    .expect(404)
     .then(({ body }) => {
         expect(body.msg).toBe('topic not found')
+    })
+  })
+  test('GET request should respond with 200 and an empty array, when topic exists but no comments', () => {
+    return request(app)
+    .get('/api/articles?topic=paper')
+    .expect(200)
+    .then(({ body }) => {
+      const {articles} = body
+        expect(articles).toEqual([])
     })
   })
 });
