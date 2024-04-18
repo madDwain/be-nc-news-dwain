@@ -226,7 +226,7 @@ describe("api/articles/:article_id/comments", () => {
         .get("/api/articles/78787HELLO/comments")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("article_id is not a number");
+          expect(body.msg).toBe("invalid id type");
         });
     });
   });
@@ -273,7 +273,7 @@ describe("api/articles/:article_id/comments", () => {
         .send(newComment)
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("article_id is not a number");
+          expect(body.msg).toBe("invalid id type");
         });
     });
     test("should return with 400 and a msg of invalid comment object if the object does not have a username property", () => {
@@ -353,7 +353,7 @@ describe("/api/comments/:comment_id", () => {
         .delete("/api/comments/notanumber")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("invalid comment id");
+          expect(body.msg).toBe("invalid id type");
         });
     });
   });

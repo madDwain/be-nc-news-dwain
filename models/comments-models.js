@@ -12,9 +12,6 @@ function fetchCommentsByArticleID(article_id) {
       }
       return rows;
     })
-    .catch((err) => {
-        return Promise.reject(err)
-    });
 }
 
 function insertComment(username, body, article_id) {
@@ -29,9 +26,6 @@ function insertComment(username, body, article_id) {
     .then(({ rows }) => {
       return rows[0];
     })
-    .catch((err) => {
-      return Promise.reject(err)
-    });
 }
 
 function fetchCommentById(comment_id) {
@@ -55,12 +49,6 @@ function removeComment(comment_id) {
         return Promise.reject({ status: 404, msg: "comment id not found" });
       }
     })
-    .catch((err) => {
-      if (err.code === "22P02") {
-        return Promise.reject({ status: 400, msg: "invalid comment id" });
-      }
-      return Promise.reject(err);
-    });
 }
 
 module.exports = {

@@ -37,9 +37,6 @@ async function fetchAllArticles(topic) {
       return resolvedArray;
     });
   })
-  .catch((err) => {
-    return Promise.reject(err)
-})
 }
 
 function incVotesOnArticle(article_id, inc_votes) {
@@ -54,9 +51,6 @@ function incVotesOnArticle(article_id, inc_votes) {
       }
       return rows[0];
     })
-    .catch((err) => {
-      return Promise.reject(err);
-    });
 }
 
 module.exports = {
