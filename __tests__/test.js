@@ -91,9 +91,9 @@ describe("/api/articles/:article_id", () => {
           expect(body.msg).toBe("invalid article ID");
         });
     });
-    test("should respond with an object containing the comment_count for the article_id when passed a query=comment_count", () => {
+    test("should respond with an object containing the comment_count for the article_id", () => {
       return request(app)
-        .get("/api/articles/1?query=comment_count")
+        .get("/api/articles/1")
         .then(({ body }) => {
           const { article } = body;
           expect(article.comment_count).toBe("11");
