@@ -8,6 +8,7 @@ const {
   fetchCommentById,
 } = require("../models/comments-models");
 const { fetchUsers } = require("../models/users-models");
+const { sort } = require("../db/data/test-data/articles");
 
 function getTopics(req, res, next) {
   return fetchTopics().then((topics) => {
@@ -33,7 +34,9 @@ function getArticle(req, res, next) {
 
 function getAllArticles(req, res, next) {
   const { topic } = req.query;
-  return fetchAllArticles(topic)
+  const { sort_by } = req.query
+  const { order } = req.query
+  return fetchAllArticles(topic, sort_by, order)
     .then((articles) => {
       res.status(200).send({ articles });
     })

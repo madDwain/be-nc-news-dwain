@@ -264,6 +264,38 @@ describe("/api/articles", () => {
         });
       });
   });
+  test("GET request should accept a sort_by query, taking any valid column and return the sorted array", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("votes", { descending: true });
+      });
+  });
+  test("GET request should return 400 bad request if the query is not a valid column", () => {
+    return request(app)
+    .get("/api/articles?sort_by=notacolumn")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad request")
+    })
+  })
+  test("GET request should accept a order request of asc or desc and return the array ordered as given", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { ascending: true });
+      });
+  })
+  test("GET request should return 400 bad request if an order query is given which is not asc or desc", () => {
+    return request(app)
+    .get("/api/articles?order=notascordesc")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad request")
+    })
+  })
 });
 
 describe("api/articles/:article_id/comments", () => {
@@ -382,8 +414,8 @@ describe("api/articles/:article_id/comments", () => {
       const newComment = {
         username: "icellusedkars",
         body: "W article",
-        year: '2024',
-        mood: 'happy'
+        year: "2024",
+        mood: "happy",
       };
       return request(app)
         .post("/api/articles/2/comments")
