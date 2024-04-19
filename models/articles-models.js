@@ -21,7 +21,18 @@ function fetchArticleById(article_id) {
     })
 }
 
-async function fetchAllArticles(topic) {
+async function fetchAllArticles(topic, sort_by='created_at', order='DESC') {
+  order = order.toUpperCase()
+  const validOrders = ['ASC', 'DESC']
+  if (!validOrders.includes(order)) {
+    return Promise.reject({status: 400, msg: "Bad request"})
+  }
+
+  const validSorts = ["title", "topic", "author", "body", "created_at", 'votes']
+  if (!validSorts.includes(sort_by)) {
+    return Promise.reject({status: 400, msg: "Bad request"})
+  }
+
   let sqlString =
     "SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, article_img_url FROM articles JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id;";
   if (topic) {
@@ -42,9 +53,8 @@ async function fetchAllArticles(topic) {
       if (topic) {
         sqlString += ` WHERE topic='${topic}'`;
       }
-
       sqlString +=
-        " GROUP BY articles.article_id ORDER BY articles.created_at DESC;";
+        ` GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order};`;
 
       return db.query(sqlString);
     })
