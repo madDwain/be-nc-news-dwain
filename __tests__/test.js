@@ -378,6 +378,27 @@ describe("api/articles/:article_id/comments", () => {
           expect(body.msg).toBe("invalid comment object");
         });
     });
+    test("should respond with 201 when passed a newComment object, ignoring extra properties", () => {
+      const newComment = {
+        username: "icellusedkars",
+        body: "W article",
+        year: '2024',
+        mood: 'happy'
+      };
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const comment = body;
+          expect(comment.author).toBe("icellusedkars");
+          expect(comment.comment_id).toBe(19);
+          expect(comment.votes).toBe(0);
+          expect(comment).toHaveProperty("created_at");
+          expect(comment.body).toBe("W article");
+          expect(comment.article_id).toBe(2);
+        });
+    });
     test("should return 400 and a msg of invalid comment passed if either body or username is not a string", () => {
       const newComment = {
         body: 12345,
