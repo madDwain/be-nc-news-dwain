@@ -1,14 +1,13 @@
 const { fetchTopics } = require("../models/topics-models");
-const {
-  fetchArticleById,
-  fetchAllArticles,
-} = require("../models/articles-models");
+;
 const {
   fetchCommentsByArticleID,
   fetchCommentById,
 } = require("../models/comments-models");
 const { fetchUsers } = require("../models/users-models");
-const { sort } = require("../db/data/test-data/articles");
+const { fetchArticleById,
+  fetchAllArticles } = require('../models/articles-models')
+
 
 function getTopics(req, res, next) {
   return fetchTopics().then((topics) => {
@@ -25,6 +24,8 @@ function getArticle(req, res, next) {
   const { article_id } = req.params;
   return fetchArticleById(article_id)
     .then((article) => {
+      console.log('in article model')
+
       res.status(200).send({ article });
     })
     .catch((err) => {
