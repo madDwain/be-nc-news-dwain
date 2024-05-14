@@ -28,7 +28,7 @@ async function fetchAllArticles(topic, sort_by='created_at', order='DESC') {
     return Promise.reject({status: 400, msg: "Bad request"})
   }
 
-  const validSorts = ["title", "topic", "author", "body", "created_at", 'votes']
+  const validSorts = ["title", "topic", "author", "body", "created_at", 'votes', 'comment_count']
   if (!validSorts.includes(sort_by)) {
     return Promise.reject({status: 400, msg: "Bad request"})
   }
