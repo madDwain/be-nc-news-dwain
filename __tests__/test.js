@@ -340,7 +340,7 @@ describe("api/articles/:article_id/comments", () => {
         });
     });
   });
-  describe.only("POST request", () => {
+  describe("POST request", () => {
     test("should respond with 201, accepting an object with username and body properties and respond with the comment object with the following properties: comment_id, votes, created_at, author, body, article_id", () => {
       const newComment = {
         username: "icellusedkars",
@@ -352,7 +352,6 @@ describe("api/articles/:article_id/comments", () => {
         .expect(201)
         .then(({ body }) => {
           const comment = body;
-          console.log(body)
           expect(comment.author).toBe("icellusedkars");
           expect(comment.comment_id).toBe(19);
           expect(comment.votes).toBe(0);
